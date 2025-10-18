@@ -19,7 +19,7 @@ import {
 import { Icon } from "@iconify/react";
 import GeneralTab from "./components/GeneralTab";
 import AdvancedTab from "./components/AdvancedTab";
-import ImageThumbnail from "@/Components/ImageThumbnail";
+import ImageThumbnail from "@/components/ImageThumbnail";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
