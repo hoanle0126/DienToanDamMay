@@ -1,6 +1,6 @@
-import RadialChart from "@/Components/Charts/RadialChart";
-import RadialChartLegend from "@/Components/Charts/RadialChart/components/legend";
-import RadialChartState from "@/Components/Charts/RadialChart/elements/state";
+import RadialChart from "@/components/Charts/RadialChart";
+import RadialChartLegend from "@/components/Charts/RadialChart/components/legend";
+import RadialChartState from "@/components/Charts/RadialChart/elements/state";
 import { Box, Paper, Typography } from "@mui/material";
 import React from "react";
 

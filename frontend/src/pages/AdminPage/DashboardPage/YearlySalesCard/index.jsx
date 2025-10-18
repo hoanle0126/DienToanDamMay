@@ -1,6 +1,6 @@
-import AreaChart from "@/Components/Charts/AreaChart";
-import AreaChartLegend from "@/Components/Charts/AreaChart/components/legend";
-import AreaChartState from "@/Components/Charts/AreaChart/elements/state";
+import AreaChart from "@/components/Charts/AreaChart";
+import AreaChartLegend from "@/components/Charts/AreaChart/components/legend";
+import AreaChartState from "@/components/Charts/AreaChart/elements/state";
 import { Box, Button, Card, MenuItem, Paper, Select, Stack, Typography } from "@mui/material";
 import React from "react";
 
