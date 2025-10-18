@@ -1,4 +1,4 @@
-import { typography } from "@/Theme/elements/typography";
+import { typography } from "@/theme/elements/typography";
 import { Box } from "@mui/material";
 import BulletList from "@tiptap/extension-bullet-list";
 import OrderedList from "@tiptap/extension-ordered-list";
@@ -16,7 +16,7 @@ import React from "react";
 import MenuBar from "./menuBar";
 import HardBreak from "@tiptap/extension-hard-break";
 import Image from "@tiptap/extension-image";
-import { MuiTheme } from "@/Theme";
+import { MuiTheme } from "@/theme";
 import GlobalStyle from "../GlobalStyle";
 
 const EditorTiptap = ({ content, setContent }) => {

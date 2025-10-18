@@ -1,4 +1,4 @@
-import { typography } from "@/Theme/elements/typography";
+import { typography } from "@/theme/elements/typography";
 import { GridToolbarContainer } from "@mui/x-data-grid";
 import React from "react";
 import { useStateContext } from "../../../../../Context";

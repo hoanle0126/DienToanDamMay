@@ -7,7 +7,7 @@ import {
   Button,
 } from "@mui/material";
 import React from "react";
-import { MuiTheme } from "@/Theme";
+import { MuiTheme } from "@/theme";
 import { Icon } from "@iconify/react";
 import CardDataGrid from "./components/CardDataGrid";
 import { Link } from "react-router-dom";

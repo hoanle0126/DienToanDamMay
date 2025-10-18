@@ -1,4 +1,4 @@
-import { MuiTheme } from "@/Theme";
+import { MuiTheme } from "@/theme";
 import React from "react";
 
 const RadialChartState = () => {

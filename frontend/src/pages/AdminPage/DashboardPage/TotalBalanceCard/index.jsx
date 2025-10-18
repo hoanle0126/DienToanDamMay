@@ -1,5 +1,5 @@
 import LineChart from "@/Components/Charts/LineChart";
-import { MuiTheme } from "@/Theme";
+import { MuiTheme } from "@/theme";
 import { Icon } from "@iconify/react";
 import { Box, Paper, Stack, Typography } from "@mui/material";
 import React from "react";

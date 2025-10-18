@@ -13,7 +13,7 @@ import {
 import React from "react";
 import { ShowParam } from "./components/ShowParam";
 import { Icon } from "@iconify/react";
-import { MuiTheme } from "@/Theme";
+import { MuiTheme } from "@/theme";
 import ListImage from "@/Components/ListImages";
 import EditorTiptap from "../../../../../../Components/EditorTiptap";
 

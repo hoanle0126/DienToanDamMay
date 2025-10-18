@@ -13,7 +13,7 @@ import {
   OutlinedInput,
 } from "@mui/material";
 import React from "react";
-import { MuiTheme } from "@/Theme";
+import { MuiTheme } from "@/theme";
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 import { formatCurrency } from "@/Function/formatCurrency";

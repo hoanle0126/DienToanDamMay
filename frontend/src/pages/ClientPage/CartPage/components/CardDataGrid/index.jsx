@@ -3,7 +3,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import React, { useRef } from "react";
 import DataGridHeader from "./DataGridHeader";
 import DataGridToolbar from "./DataGridToolbar";
-import { MuiTheme } from "@/Theme";
+import { MuiTheme } from "@/theme";
 import { useSelector } from "react-redux";
 
 const CardDataGrid = () => {
