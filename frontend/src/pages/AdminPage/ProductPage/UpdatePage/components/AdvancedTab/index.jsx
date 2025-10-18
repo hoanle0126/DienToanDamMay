@@ -15,7 +15,7 @@ import { ShowParam } from "./components/ShowParam";
 import { Icon } from "@iconify/react";
 import { MuiTheme } from "@/theme";
 import ListImage from "@/components/ListImages";
-import EditorTiptap from "../../../../../../Components/EditorTiptap";
+import EditorTiptap from "../../../../../../components/EditorTiptap";
 
 const AdvancedTab = ({ product, setProduct }) => {
   return (
