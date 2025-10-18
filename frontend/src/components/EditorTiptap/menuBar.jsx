@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { Icon } from "@iconify/react";
-import { MuiTheme } from "../../Theme";
+import { MuiTheme } from "../../theme";
 import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
 
 const MenuBar = ({ editor }) => {
