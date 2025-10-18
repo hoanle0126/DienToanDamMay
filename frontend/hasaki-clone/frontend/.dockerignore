@@ -1,0 +1,52 @@
+# Ignore node_modules directory
+node_modules
+
+# Ignore build output
+build
+dist
+
+# Ignore log files
+*.log
+
+# Ignore environment variable files
+.env
+
+# Ignore Docker files
+Dockerfile
+.dockerignore
+
+# Ignore any other files you don't want to include in the Docker image
+*.md
+*.json
+*.ts
+*.jsx
+*.js
+*.css
+*.scss
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+*.ico
+*.woff
+*.woff2
+*.ttf
+*.eot
+*.map
+*.zip
+*.tar
+*.gz
+*.tgz
+*.rar
+*.7z
+*.bak
+*.tmp
+*.swp
+*.swo
+*.DS_Store
+*.env.local
+*.env.development
+*.env.test
+*.env.production

@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # 1. Service Laravel (Chạy bằng 'php artisan serve')
+  app:
+    build:
+      context: ./backend/laravel
+      dockerfile: Dockerfile
+    container_name: my_laravel_api
+    volumes:
+      - ./backend/laravel:/var/www/html
+    # Chạy artisan serve và lắng nghe trên mọi IP (0.0.0.0)
+    # Port 8000 là port nội bộ của container
+    command: "php artisan serve --host=0.0.0.0 --port=8000"
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+  # 2. Service React (Chạy bằng 'npm run dev' của Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: my_react_vite_frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    # Chạy npm run dev và thêm cờ -- --host để Vite
+    # lắng nghe trên mọi IP (0.0.0.0) bên trong container
+    command: "npm run dev -- --host"
+    ports:
+      # Bạn có thể map port 5173 ra ngoài để debug, nhưng không bắt buộc
+      - "5173:5173" 
+    networks:
+      - app-network
+    stdin_open: true
+    tty: true
+
+  # 3. Service Nginx (Reverse Proxy)
+  nginx:
+    image: nginx:alpine
+    container_name: my_nginx_proxy
+    ports:
+      # Đây là cổng chính bạn truy cập: http://localhost:8080
+      - "8080:80" 
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+      - frontend
+    networks:
+      - app-network
+
+  # 4. Service Database
+  db:
+    image: mysql:8.0
+    container_name: my_mysql_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: laravel_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  phpmyadmin:
+      image: phpmyadmin/phpmyadmin
+      container_name: my_phpmyadmin
+      restart: unless-stopped
+      ports:
+        - "8888:80"  # <-- Bạn sẽ truy cập tại http://localhost:8888
+      environment:
+        - PMA_HOST=db        # <-- RẤT QUAN TRỌNG: trỏ đến service 'db'
+        - PMA_PORT=3306
+        - UPLOAD_LIMIT=128M  # Tăng giới hạn upload file (tùy chọn)
+      networks:
+        - app-network      # <-- Phải chung network với 'db'
+      depends_on:
+        - db               # <-- Phải khởi động sau 'db'
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local

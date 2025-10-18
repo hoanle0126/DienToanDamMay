@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log
+Dockerfile
+docker-compose.yml
+.env
+*.md
+*.log
+*.ts
+*.tsx
+*.test.js
+*.spec.js
+coverage
+dist
+build
+public
+src/**/*.test.js
+src/**/*.spec.js
