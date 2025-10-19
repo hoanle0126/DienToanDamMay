@@ -52,43 +52,42 @@ RUN php artisan config:clear || true
 RUN php artisan route:clear || true
 
 # --- BẮT ĐẦU PHẦN SỬA ---
-# Thêm 'set +H;' ở đầu để tắt history expansion (lỗi do dấu '!')
-# Sửa lại `\\.php$` (nếu có) thành `\.php$` (chỉ một dấu \)
-RUN set +H; \
-    echo 'server {' > /etc/nginx/conf.d/default.conf && \
-    echo '    listen 80;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    server_name localhost;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    root /var/www/html/public;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    index index.php index.html;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    charset utf-8;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    location / {' >> /etc/nginx/conf.d/default.conf && \
-    echo '        try_files $uri $uri/ /index.php?$query_string;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    }' >> /etc/nginx/conf.d/default.conf && \
-    echo '    location /api {' >> /etc/nginx/conf.d/default.conf && \
-    echo '        try_files $uri $uri/ /index.php?$query_string;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    }' >> /etc/nginx/conf.d/default.conf && \
-    echo '    location ~ \.php$ {' >> /etc/nginx/conf.d/default.conf && \
-    echo '        fastcgi_pass 127.0.0.1:9000;' >> /etc/nginx/conf.d/default.conf && \
-    echo '        fastcgi_index index.php;' >> /etc/nginx/conf.d/default.conf && \
-    echo '        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;' >> /etc/nginx/conf.d/default.conf && \
-    echo '        include fastcgi_params;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    }' >> /etc/nginx/conf.d/default.conf && \
-    echo '    location ~ /\.(?!well-known).* {' >> /etc/nginx/conf.d/default.conf && \
-    echo '        deny all;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    }' >> /etc/nginx/conf.d/default.conf && \
-    echo '}' >> /etc/nginx/conf.d/default.conf
+
+# Tạo file nginx.conf trực tiếp bằng 'printf' (an toàn 100%)
+RUN printf %s\n 'server {' > /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    listen 80;' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    server_name localhost;' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    root /var/www/html/public;' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    index index.php index.html;' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    charset utf-8;' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    location / {' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '        try_files $uri $uri/ /index.php?$query_string;' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    }' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    location /api {' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '        try_files $uri $uri/ /index.php?$query_string;' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    }' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    location ~ \.php$ {' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '        fastcgi_pass 127.0.0.1:9000;' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '        fastcgi_index index.php;' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '        include fastcgi_params;' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    }' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    location ~ /\.(?!well-known).* {' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '        deny all;' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '    }' >> /etc/nginx/conf.d/default.conf && \
+    printf %s\n '}' >> /etc/nginx/conf.d/default.conf
 
 # Copy frontend build từ giai đoạn 1 vào thư mục public của Laravel
 COPY --from=frontend_builder /app/frontend/dist /var/www/html/public
 
-# Tạo file start.sh trực tiếp (thay vì COPY)
-RUN echo '#!/bin/sh' > /usr/local/bin/start.sh && \
-    echo 'echo "Running database migrations..."' >> /usr/local/bin/start.sh && \
-    echo 'php artisan migrate --force' >> /usr/local/bin/start.sh && \
-    echo 'echo "Starting PHP-FPM..."' >> /usr/local/bin/start.sh && \
-    echo 'php-fpm &' >> /usr/local/bin/start.sh && \
-    echo 'echo "Starting Nginx..."' >> /usr/local/bin/start.sh && \
-    echo 'nginx -g "daemon off;"' >> /usr/local/bin/start.sh
+# Tạo file start.sh trực tiếp bằng 'printf'
+RUN printf %s\n '#!/bin/sh' > /usr/local/bin/start.sh && \
+    printf %s\n 'echo "Running database migrations..."' >> /usr/local/bin/start.sh && \
+    printf %s\n 'php artisan migrate --force' >> /usr/local/bin/start.sh && \
+    printf %s\n 'echo "Starting PHP-FPM..."' >> /usr/local/bin/start.sh && \
+    printf %s\n 'php-fpm &' >> /usr/local/bin/start.sh && \
+    printf %s\n 'echo "Starting Nginx..."' >> /usr/local/bin/start.sh && \
+    printf %s\n 'nginx -g "daemon off;"' >> /usr/local/bin/start.sh
 
 # Cấp quyền thực thi cho start.sh
 RUN chmod +x /usr/local/bin/start.sh
