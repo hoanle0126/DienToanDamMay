@@ -21,6 +21,7 @@ FROM php:8.2-fpm-alpine as backend_builder
 RUN apk add --no-cache \
     nginx \
     postgresql-client \
+    postgresql-dev \
     libzip-dev \
     zip \
     unzip \
