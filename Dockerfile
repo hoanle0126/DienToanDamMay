@@ -7,19 +7,22 @@ COPY frontend/package*.json ./
 RUN npm install
 
 COPY frontend/ .
-# Thay thế VITE_BACKEND_URL bằng đường dẫn API thật trên Render
-# (Bạn cần biết URL Backend sau khi deploy để đặt ở đây)
-# Ví dụ: VITE_BACKEND_URL=https://your-backend-service.onrender.com/api
+
+# Biến này sẽ được Render cung cấp lúc build
 ARG VITE_BACKEND_URL
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+
 RUN npm run build
 
 # Giai đoạn 2: Build Backend (Laravel) và kết hợp với Nginx
 FROM php:8.2-fpm-alpine as backend_builder
 
-# Cài đặt các thư viện hệ thống cần thiết cho PHP
+WORKDIR /var/www/html
+
+# Cài đặt các thư viện hệ thống (Đã đổi sang Postgres)
 RUN apk add --no-cache \
     nginx \
+    git \
     postgresql-client \
     postgresql-dev \
     libzip-dev \
@@ -29,16 +32,14 @@ RUN apk add --no-cache \
     jpeg-dev \
     freetype-dev \
     oniguruma-dev \
-    git \
     g++ \
     make
 
-# Cài đặt các extensions PHP
-RUN docker-php-ext-install -j$(nproc) pdo pdo_pgsql mbstring exif pcntl bcmath gd zip # <-- ĐÃ THAY ĐỔI
+# Cài đặt các extensions PHP (Đã đổi sang Postgres)
+RUN docker-php-ext-install -j$(nproc) pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
+
 # Cài đặt Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-WORKDIR /var/www/html
 
 # Copy code backend (Laravel)
 COPY backend/laravel/ .
@@ -46,17 +47,22 @@ COPY backend/laravel/ .
 # Cài đặt dependencies Composer (chỉ production)
 RUN composer install --no-dev --optimize-autoloader
 
-# Cấu hình Nginx
+# Xóa cache (nếu có) để nhận biến .env của production
+RUN php artisan config:clear || true
+RUN php artisan route:clear || true
+
+# Copy cấu hình Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Xóa cache config của Laravel (nếu có)
-RUN php artisan config:clear || true
-
-# Copy frontend build từ giai đoạn 1
+# Copy frontend build từ giai đoạn 1 vào thư mục public của Laravel
 COPY --from=frontend_builder /app/frontend/dist /var/www/html/public
+
+# Copy script khởi động
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
 
 # Expose port của Nginx
 EXPOSE 80
 
-# Chạy Nginx và PHP-FPM
-CMD ["sh", "-c", "php artisan migrate --force && nginx -g 'daemon off;' && php-fpm"]
+# Chạy script khởi động
+CMD ["/usr/local/bin/start.sh"]
