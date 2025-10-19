@@ -19,7 +19,7 @@ FROM php:8.2-fpm-alpine as backend_builder
 
 WORKDIR /var/www/html
 
-# Cài đặt các thư viện hệ thống (Đã đổi sang Postgres)
+# Cài đặt các thư viện hệ thống
 RUN apk add --no-cache \
     nginx \
     git \
@@ -33,11 +33,9 @@ RUN apk add --no-cache \
     freetype-dev \
     oniguruma-dev \
     g++ \
-    make \
-    sed \
-    dos2unix # <--- THÊM GÓI NÀY
+    make
 
-# Cài đặt các extensions PHP (Đã đổi sang Postgres)
+# Cài đặt các extensions PHP
 RUN docker-php-ext-install -j$(nproc) pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
 
 # Cài đặt Composer
@@ -53,17 +51,46 @@ RUN composer install --no-dev --optimize-autoloader
 RUN php artisan config:clear || true
 RUN php artisan route:clear || true
 
-# Copy cấu hình Nginx VÀ XÓA KÝ TỰ BOM
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-RUN dos2unix /etc/nginx/conf.d/default.conf # <--- SỬA LẠI DÒNG NÀY
+# --- BẮT ĐẦU PHẦN SỬA ---
+
+# Tạo file nginx.conf trực tiếp (thay vì COPY)
+RUN echo 'server {' > /etc/nginx/conf.d/default.conf && \
+    echo '    listen 80;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    server_name localhost;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    root /var/www/html/public;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    index index.php index.html;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    charset utf-8;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    location / {' >> /etc/nginx/conf.d/default.conf && \
+    echo '        try_files $uri $uri/ /index.php?$query_string;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    }' >> /etc/nginx/conf.d/default.conf && \
+    echo '    location /api {' >> /etc/nginx/conf.d/default.conf && \
+    echo '        try_files $uri $uri/ /index.php?$query_string;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    }' >> /etc/nginx/conf.d/default.conf && \
+    echo '    location ~ \.php$ {' >> /etc/nginx/conf.d/default.conf && \
+    echo '        fastcgi_pass 127.0.0.1:9000;' >> /etc/nginx/conf.d/default.conf && \
+    echo '        fastcgi_index index.php;' >> /etc/nginx/conf.d/default.conf && \
+    echo '        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;' >> /etc/nginx/conf.d/default.conf && \
+    echo '        include fastcgi_params;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    }' >> /etc/nginx/conf.d/default.conf && \
+    echo '    location ~ /\.(?!well-known).* {' >> /etc/nginx/conf.d/default.conf && \
+    echo '        deny all;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    }' >> /etc/nginx/conf.d/default.conf && \
+    echo '}' >> /etc/nginx/conf.d/default.conf
 
 # Copy frontend build từ giai đoạn 1 vào thư mục public của Laravel
 COPY --from=frontend_builder /app/frontend/dist /var/www/html/public
 
-# Copy script khởi động VÀ XÓA KÝ TỰ DOS
-COPY start.sh /usr/local/bin/start.sh
-RUN dos2unix /usr/local/bin/start.sh && \
-    chmod +x /usr/local/bin/start.sh
+# Tạo file start.sh trực tiếp (thay vì COPY)
+RUN echo '#!/bin/sh' > /usr/local/bin/start.sh && \
+    echo 'echo "Running database migrations..."' >> /usr/local/bin/start.sh && \
+    echo 'php artisan migrate --force' >> /usr/local/bin/start.sh && \
+    echo 'echo "Starting PHP-FPM..."' >> /usr/local/bin/start.sh && \
+    echo 'php-fpm &' >> /usr/local/bin/start.sh && \
+    echo 'echo "Starting Nginx..."' >> /usr/local/bin/start.sh && \
+    echo 'nginx -g "daemon off;"' >> /usr/local/bin/start.sh
+
+# Cấp quyền thực thi cho start.sh
+RUN chmod +x /usr/local/bin/start.sh
 
 # Expose port của Nginx
 EXPOSE 80
