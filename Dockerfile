@@ -52,9 +52,10 @@ RUN php artisan config:clear || true
 RUN php artisan route:clear || true
 
 # --- BẮT ĐẦU PHẦN SỬA ---
-
-# Tạo file nginx.conf trực tiếp (thay vì COPY)
-RUN echo 'server {' > /etc/nginx/conf.d/default.conf && \
+# Thêm 'set +H;' ở đầu để tắt history expansion (lỗi do dấu '!')
+# Sửa lại `\\.php$` (nếu có) thành `\.php$` (chỉ một dấu \)
+RUN set +H; \
+    echo 'server {' > /etc/nginx/conf.d/default.conf && \
     echo '    listen 80;' >> /etc/nginx/conf.d/default.conf && \
     echo '    server_name localhost;' >> /etc/nginx/conf.d/default.conf && \
     echo '    root /var/www/html/public;' >> /etc/nginx/conf.d/default.conf && \
