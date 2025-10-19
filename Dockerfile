@@ -20,7 +20,7 @@ FROM php:8.2-fpm-alpine as backend_builder
 # Cài đặt các thư viện hệ thống cần thiết cho PHP
 RUN apk add --no-cache \
     nginx \
-    mysql-client \
+    postgresql-client \
     libzip-dev \
     zip \
     unzip \
@@ -33,8 +33,7 @@ RUN apk add --no-cache \
     make
 
 # Cài đặt các extensions PHP
-RUN docker-php-ext-install -j$(nproc) pdo pdo_mysql mbstring exif pcntl bcmath gd zip
-
+RUN docker-php-ext-install -j$(nproc) pdo pdo_pgsql mbstring exif pcntl bcmath gd zip # <-- ĐÃ THAY ĐỔI
 # Cài đặt Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
