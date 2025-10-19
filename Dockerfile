@@ -34,7 +34,8 @@ RUN apk add --no-cache \
     oniguruma-dev \
     g++ \
     make \
-    sed # <-- Thêm 'sed' để dọn dẹp file
+    sed \
+    dos2unix # <--- THÊM GÓI NÀY
 
 # Cài đặt các extensions PHP (Đã đổi sang Postgres)
 RUN docker-php-ext-install -j$(nproc) pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
