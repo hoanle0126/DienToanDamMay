@@ -15,7 +15,7 @@ ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 RUN npm run build
 
 # Giai đoạn 2: Build Backend (Laravel) và kết hợp với Nginx
-FROM php:8.2-fpm-alpine as backend_builder
+FROM php:8.2-alpine
 
 WORKDIR /var/www/html
 
