@@ -55,14 +55,14 @@ RUN php artisan route:clear || true
 
 # Copy cấu hình Nginx VÀ XÓA KÝ TỰ BOM
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-RUN sed -i '1s/^\xEF\xBB\xBF//' /etc/nginx/conf.d/default.conf
+RUN dos2unix /etc/nginx/conf.d/default.conf # <--- SỬA LẠI DÒNG NÀY
 
 # Copy frontend build từ giai đoạn 1 vào thư mục public của Laravel
 COPY --from=frontend_builder /app/frontend/dist /var/www/html/public
 
 # Copy script khởi động VÀ XÓA KÝ TỰ DOS
 COPY start.sh /usr/local/bin/start.sh
-RUN sed -i 's/\r$//' /usr/local/bin/start.sh && \
+RUN dos2unix /usr/local/bin/start.sh && \
     chmod +x /usr/local/bin/start.sh
 
 # Expose port của Nginx
